@@ -126,8 +126,6 @@ local function asharp(startPos, endPos)
       end
     end
 
-    log("{x = " .. currentNode.x .. ", y = " .. currentNode.y .. "},")
-
     if currentNode.x == endPos.x and currentNode.y == endPos.y then
       path = {}
       curr = currentNode
@@ -156,10 +154,6 @@ local function asharp(startPos, endPos)
             limit = 1
           } == 0
        then
-        if child.x == 17 and child.y == -9 then 
-          log("Child checks out mate")
-      
-        end
         table.insert(applicableChildren, child)
       end
     end

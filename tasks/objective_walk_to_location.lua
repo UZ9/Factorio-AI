@@ -58,38 +58,29 @@ local function getDirection(player, target, xDist, yDist)
   --player.print(angle)
 
   if angle > 337.5 then
-    player.print("north")
     return defines.direction.north
   end
   if angle > 292.5 then
-    player.print("northwest")
     return defines.direction.northwest
   end
   if angle > 247.5 then
-    player.print("west")
     return defines.direction.west
   end
   if angle > 202.5 then
-    player.print("southwest")
     return defines.direction.southwest
   end
   if angle > 157.5 then
-    player.print("south")
     return defines.direction.south
   end
   if angle > 122.5 then
-    player.print("southeast")
     return defines.direction.southeast
   end
   if angle > 67.5 then
-    player.print("east")
     return defines.direction.east
   end
   if angle > 22.5 then
-    player.print("northeast")
     return defines.direction.northeast
   end
-  player.print("north")
   return defines.direction.north
 end
 
