@@ -1,0 +1,10 @@
+{
+    "name": "factorio-ai",
+    "version": "0.1.0",
+    "title": "Factorio AI",
+    "author": "Yerti",
+    "contact": "",
+    "factorio_version": "0.18",
+    "dependencies": ["base >= 0.18"]
+
+}
