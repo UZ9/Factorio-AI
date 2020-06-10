@@ -211,47 +211,6 @@ script.on_init(
         player.print("Invalid Tile")
       end
 
-      rendering.draw_rectangle {
-        color = {r = 0, g = 1, b = 0, a = 1},
-        filled = true,
-        left_top = {endPos.x, endPos.y},
-        right_bottom = {endPos.x + 1, endPos.y + 1},
-        surface = game.surfaces[1]
-      }
-
-      --player.print(serpent.block(list))
-
-      --player.print(tablelength(list))
-
-      --player.print(player.surface.get_tile(player.position.x, player.position.y).collides_with("player-layer"))
-
-      --[[
-      group =
-        game.surfaces[1].create_unit_group {
-        position = {player.position.x - 10, player.position.y - 10},
-        force = "enemy"
-      }
-
-      entity =
-        game.surfaces[1].create_entity {
-        name = "ai-pathfinder",
-        position = {player.position.x - 10, player.position.y - 10}
-      }
-
-      group.add_member(entity)
-
-      group.set_command(
-        {
-          type = defines.command.go_to_location,
-          destination = {x = player.position.x, y = player.position.y},
-          distraction = defines.distraction.none
-        }
-      )
-
-      group.start_moving()
-      --]]
-
-      --player.print(group.state)
     end
   end
 )

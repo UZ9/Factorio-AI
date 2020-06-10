@@ -84,28 +84,6 @@ local function getDirection(player, target, xDist, yDist)
   return defines.direction.north
 end
 
-function moveTo(player, xDist, yDist, distEuc)
-  -- moveTo
-  --
-  if xDist >= TILE_RADIUS and yDist >= TILE_RADIUS then
-    player.walking_state = {walking = true, direction = defines.direction.southeast}
-  elseif xDist <= -TILE_RADIUS and yDist >= TILE_RADIUS then
-    player.walking_state = {walking = true, direction = defines.direction.southwest}
-  elseif xDist >= TILE_RADIUS and yDist <= -TILE_RADIUS then
-    player.walking_state = {walking = true, direction = defines.direction.northeast}
-  elseif xDist <= -TILE_RADIUS and yDist <= -TILE_RADIUS then
-    player.walking_state = {walking = true, direction = defines.direction.northwest}
-  elseif yDist >= TILE_RADIUS then
-    player.walking_state = {walking = true, direction = defines.direction.south}
-  elseif yDist <= -TILE_RADIUS then
-    player.walking_state = {walking = true, direction = defines.direction.north}
-  elseif xDist >= TILE_RADIUS then
-    player.walking_state = {walking = true, direction = defines.direction.east}
-  elseif xDist <= -TILE_RADIUS then
-    player.walking_state = {walking = true, direction = defines.direction.west}
-  end
-end
-
 local function round(value)
   return math.floor(value + 0.5)
 end
