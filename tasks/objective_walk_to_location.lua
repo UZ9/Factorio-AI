@@ -4,7 +4,7 @@ WalkToLocationObjective = Objective:new()
 
 WalkToLocationObjective.target = nil
 
-local TILE_RADIUS = 0.1
+local TILE_RADIUS = 0.3
 WalkToLocationObjective.done = false
 
 local function tablelength(table)
@@ -15,30 +15,6 @@ local function tablelength(table)
   return count
 end
 
-local function find_nearest_entity(xPosPlayer, yPosPlayer, game, player, entity)
-  local i = 1
-  local entityCount = 0
-  while entityCount == 0 do
-    i = i + 1
-    entityCount =
-      game.surfaces[1].count_entities_filtered {
-      area = {{xPosPlayer - i, yPosPlayer - i}, {xPosPlayer + i, yPosPlayer + i}},
-      name = entity
-    }
-  end
-  entityFind =
-    game.surfaces[1].find_entities_filtered {
-    area = {{xPosPlayer - i, yPosPlayer - i}, {xPosPlayer + i, yPosPlayer + i}},
-    name = entity,
-    limit = 1
-  }
-  allEntities =
-    game.surfaces[1].find_entities_filtered {
-    area = {{xPosPlayer - i, yPosPlayer - i}, {xPosPlayer + i, yPosPlayer + i}}
-  }
-  return entityCount, entityFind, allEntities, i
-end
-
 local function getDegrees(player, target, xDist, yDist)
   if xDist > 0 and yDist >= 0 then 
     return math.deg(math.atan(xDist/yDist)) + 90 --quadrant 4
@@ -47,7 +23,7 @@ local function getDegrees(player, target, xDist, yDist)
   elseif xDist <= 0 and yDist > 0 then --quadrant 3
     return math.deg(math.atan(-xDist/yDist)) + 180
   elseif xDist <= 0 and yDist < 0 then --quadrant 2
-    return math.deg(math.atan(-xDist/yDist)) + 270
+    return math.deg(math.atan(-xDist/-yDist)) + 270
   else 
     return -1
   end
@@ -100,14 +76,15 @@ function WalkToLocationObjective:tick(par)
 
   distance =
     math.sqrt(
-    math.pow(math.abs(player.position.x - self.target.x + 0.5), 2) +
-      math.pow(math.abs(player.position.y - self.target.y + 0.5), 2)
+    math.pow(math.abs(player.position.x - (self.target.x + 0.5)), 2) +
+      math.pow(math.abs(player.position.y - (self.target.y + 0.5)), 2)
   )
 
   xDist = self.target.x - player.position.x + 0.5
   yDist = self.target.y - player.position.y + 0.5
 
   if math.abs(xDist) > TILE_RADIUS or math.abs(yDist) > TILE_RADIUS then
+    player.character_running_speed_modifier = 0.1
     player.walking_state = {walking = true, direction = getDirection(player, self.target, xDist, yDist)}
     --moveTo(player, xDist, yDist, distance)
     --player.print("seems that dist was greater than tile radius (" .. distance .. " > " .. TILE_RADIUS .. ")")
