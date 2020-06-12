@@ -5,7 +5,6 @@ WalkToLocationObjective = Objective:new()
 WalkToLocationObjective.target = nil
 
 local TILE_RADIUS = 0.3
-WalkToLocationObjective.done = false
 
 local function tablelength(table)
   local count = 0

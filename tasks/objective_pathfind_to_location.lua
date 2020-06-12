@@ -10,6 +10,28 @@ local function round(value)
     return math.floor(value + 0.5)
 end
 
+local function collidesWith(position, game)
+    tile = game.surfaces[1].get_tile {x = position.x, y = position.y}
+    if
+        tile.collides_with("player-layer") == false and
+            game.surfaces[1].count_entities_filtered {
+                area = {tile.position, {x = tile.position.x + 1, y = tile.position.y + 1}},
+                limit = 1,
+                collision_mask = "player-layer"
+            } == 0
+     then
+        game.players[1].print("Found one at " .. tile.position.x .. ", " .. tile.position.y)
+        return true
+    else
+        return false
+    end
+end
+
+--[[
+
+
+]]
+
 function PathfindToLocationObjective:finished(par)
     return self.done == true
 end
@@ -40,7 +62,7 @@ local function containsNode(list, child)
     return dont
 end
 
-local function asharp(startPos, endPos)
+function asharp(startPos, endPos)
 
     openList = {}
     closedList = {}
@@ -71,7 +93,7 @@ local function asharp(startPos, endPos)
             return path
         end
 
-        log(currentNode.x .. ", " .. currentNode.y)
+        --log(currentNode.x .. ", " .. currentNode.y)
 
         table.remove(openList, currentIndex)
         table.insert(closedList, currentNode)
@@ -85,11 +107,7 @@ local function asharp(startPos, endPos)
 
             if
                 containsNode(closedList, child) == false and
-                    game.surfaces[1].get_tile({x = child.x, y = child.y}).collides_with("player-layer") == false and
-                    game.surfaces[1].count_entities_filtered {
-                        area = {{x = child.x, y = child.y}, {x = child.x + 1, y = child.y + 1}},
-                        limit = 1
-                    } == 0
+                    collidesWith({x = child.x, y = child.y}, game) == true
              then
                 table.insert(applicableChildren, child)
             end
@@ -121,17 +139,14 @@ function PathfindToLocationObjective:tick(par)
         return
     end
 
-    log("Running when there are " .. #par.currentObjectiveTable .. " elements in list")
-
     if
         game.surfaces[1].count_entities_filtered {
             area = {{x = self.target.x, y = self.target.y}, {x = self.target.x + 1, y = self.target.y + 1}},
-            limit = 1
+            limit = 1,
+            collision_mask="player-layer"
         } == 0
      then
         list = asharp(PathTile:new {x = round(par.p.position.x), y = round(par.p.position.y)}, self.target)
-
-        log("Finished pathfinding")
 
         for i = 1, #list do
             element = list[i]

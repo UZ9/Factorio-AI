@@ -1,5 +1,7 @@
 Objective = {}
 
+Objective.done = false
+
 function Objective:new (o)
     o = o or {}
     setmetatable(o, self)

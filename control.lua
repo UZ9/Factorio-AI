@@ -3,6 +3,7 @@ require "tasks/objective"
 require "path_tile"
 require "tasks/objective_walk_to_location"
 require "tasks/objective_pathfind_to_location"
+require "tasks/objective_find_ore"
 
 local SEARCH_OFFSET = 1
 local GLOBAL_SURFACE_MAP = {{-32, -32}, {32, 32}}
@@ -17,10 +18,8 @@ local success_flag = 0
 local done = false
 
 local currentObjective = {
-  PathfindToLocationObjective:new {target = {x = -30, y = -30}},
-  PathfindToLocationObjective:new {target = {x = -20, y = -45}},
-  PathfindToLocationObjective:new {target = {x = -41, y = -63}},
-  PathfindToLocationObjective:new {target = {x = -41, y = -70}}
+  FindOreObjective:new {entityType = "iron-ore"},
+  --PathfindToLocationObjective:new{target={x = 84, y = -42}}
 }
 
 local entity
@@ -52,7 +51,7 @@ script.on_event(
               player.print("Finished Task")
               table.remove(currentObjective, 1)
             else
-              currentObjective[1]:tick {event = e, p = player, currentObjectiveTable = currentObjective}
+              currentObjective[1]:tick {event = e, p = player, currentObjectiveTable = currentObjective, game = game}
             end
           else
             player.print("Finished All Tasks")
