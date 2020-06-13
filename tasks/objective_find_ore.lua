@@ -9,7 +9,7 @@ local function round(value)
     return math.floor(value + 0.5)
 end
 
-local function collidesWith(position, game)
+function collidesWith(position, game)
     tile = game.surfaces[1].get_tile {x = position.x, y = position.y}
     if
         tile.collides_with("player-layer") == false and
