@@ -4,6 +4,7 @@ require "path_tile"
 require "tasks/objective_walk_to_location"
 require "tasks/objective_pathfind_to_location"
 require "tasks/objective_find_ore"
+require "tasks/objective_build_structure"
 
 local SEARCH_OFFSET = 1
 local GLOBAL_SURFACE_MAP = {{-32, -32}, {32, 32}}
@@ -19,6 +20,7 @@ local done = false
 
 local currentObjective = {
   FindOreObjective:new {entityType = "iron-ore"},
+  BuildStructureObjective:new {type = "burner-mining-drill", target = {x=0,y=0}} --target is relative to player position
   --PathfindToLocationObjective:new{target={x = 84, y = -42}}
 }
 

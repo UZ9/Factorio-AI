@@ -4,14 +4,15 @@ require "util/util"
 BuildStructureObjective = Objective:new()
 
 BuildStructureObjective.target = nil
+BuildStructureObjective.position = nil --temporary workaround until I find a better solution that doesn't use target AND position
 BuildStructureObjective.type = nil
 BuildStructureObjective.entity = nil
 
 local function isPlayerInBox(playerPos, playerBox, targetPos, targetBox)
     return playerPos.x + playerBox.left_top.x <= targetPos.x + targetBox.right_bottom.x and
-        playerPos.x + playerBox.right_bottom.x >= targetPos.x + b.left_top.x and
-        playerPos.y + playerBox.left_top.y <= targetPos.y + b.right_bottom.y and
-        playerPos.y + playerBox.right_bottom.y >= targetPos.y + b.left_top.y
+        playerPos.x + playerBox.right_bottom.x >= targetPos.x + targetBox.left_top.x and
+        playerPos.y + playerBox.left_top.y <= targetPos.y + targetBox.right_bottom.y and
+        playerPos.y + playerBox.right_bottom.y >= targetPos.y + targetBox.left_top.y
 end
 
 function BuildStructureObjective:finished(par)
@@ -19,24 +20,55 @@ function BuildStructureObjective:finished(par)
 end
 
 function BuildStructureObjective:tick(par)
+
+    if self.position == nil then 
+        self.position = {x = math.floor(par.p.position.x) + self.target.x, y = math.floor(par.p.position.y) + self.target.y}
+    end
+
+    targetPos = self.position
+
     if
-        (distanceSquared(par.p.position, self.target.position) > 36) or
+        (distanceSquared(par.p.position, targetPos) > 36) or
             isPlayerInBox(
                 par.p.position,
-                game.entity_prototypes["player"].collision_box,
-                self.target.position,
-                game.entity_prototypes[self.type]
+                game.entity_prototypes["character"].collision_box,
+                targetPos,
+                game.entity_prototypes[self.type].collision_box
             )
      then --36 is default distance squared
+        --self.done = true
         --move to somewhere to be in range
         par.p.print("Outside of build range")
 
-        self.done = true
+        if isPlayerInBox(
+                par.p.position,
+                par.game.entity_prototypes["character"].collision_box,
+                targetPos,
+                par.game.entity_prototypes[self.type].collision_box
+        ) then 
+            par.p.print("in box")
+        end
+
+        if distanceSquared(par.p.position, targetPos) > 36 then 
+            par.p.print("distance ")
+        end
+
+        collider = game.entity_prototypes[self.type].collision_box
+
+        par.p.print("{" .. collider.left_top.x .. ", " .. collider.left_top.y .. "}")
+
+        table.insert(
+            par.currentObjectiveTable,
+            1,
+            WalkToLocationObjective:new {
+                target = {x = self.position.x + collider.left_top.x + 0.1, y = 0.1 + self.position.y + collider.left_top.y}
+            }
+        )
     else
         if
             (par.pr.surface.can_place_entity {
                 name = self.type,
-                position = self.target.position,
+                position = targetPos,
                 direction = defines.direction.north,
                 force = par.p.force
             })
@@ -49,7 +81,7 @@ function BuildStructureObjective:tick(par)
                 self.entity =
                     player.surface.create_entity {
                     name = self.type,
-                    position = self.target.position,
+                    position = targetPos,
                     direction = defines.direction.north,
                     force = player.force
                 }
@@ -59,7 +91,7 @@ function BuildStructureObjective:tick(par)
         else
             for x = 1, game.entity_prototypes[self.type].collision_box.x do
                 for y = 1, game.entity_prototypes[self.type].collision_box.y do
-                    if collidesWith({x = self.target.position.x + x, y = self.target.position.y + y}, par.game) == true then
+                    if collidesWith({x = targetPos.x + x, y = targetPos.y + y}, par.game) == true then
                         targetEntity =
                             par.game.surfaces[1].find_entities_filtered {
                             area = {tile.position, {x = tile.position.x + 1, y = tile.position.y + 1}},
@@ -69,7 +101,9 @@ function BuildStructureObjective:tick(par)
                         table.insert(
                             par.currentObjectiveTable,
                             1,
-                            ClearEnvironmentObjective:new {target = {x = targetEntity.position.x, y = targetEntity.position.y}}
+                            ClearEnvironmentObjective:new {
+                                target = {x = targetEntity.position.x, y = targetEntity.position.y}
+                            }
                         )
                     end
                 end
