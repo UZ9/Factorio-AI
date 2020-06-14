@@ -20,9 +20,11 @@ function BuildStructureObjective:finished(par)
 end
 
 function BuildStructureObjective:tick(par)
-
-    if self.position == nil then 
-        self.position = {x = math.floor(par.p.position.x) + self.target.x, y = math.floor(par.p.position.y) + self.target.y}
+    if self.position == nil then
+        self.position = {
+            x = math.floor(par.p.position.x) + self.target.x,
+            y = math.floor(par.p.position.y) + self.target.y
+        }
     end
 
     targetPos = self.position
@@ -40,16 +42,18 @@ function BuildStructureObjective:tick(par)
         --move to somewhere to be in range
         par.p.print("Outside of build range")
 
-        if isPlayerInBox(
+        if
+            isPlayerInBox(
                 par.p.position,
                 par.game.entity_prototypes["character"].collision_box,
                 targetPos,
                 par.game.entity_prototypes[self.type].collision_box
-        ) then 
+            )
+         then
             par.p.print("in box")
         end
 
-        if distanceSquared(par.p.position, targetPos) > 36 then 
+        if distanceSquared(par.p.position, targetPos) > 36 then
             par.p.print("distance ")
         end
 
@@ -57,23 +61,25 @@ function BuildStructureObjective:tick(par)
 
         par.p.print("{" .. collider.left_top.x .. ", " .. collider.left_top.y .. "}")
 
-        table.insert(
-            par.currentObjectiveTable,
-            1,
+        movementOrder =
             WalkToLocationObjective:new {
-                target = {x = self.position.x + collider.left_top.x + 0.1, y = 0.1 + self.position.y + collider.left_top.y}
+            target = {
+                x = self.position.x + collider.left_top.x,
+                y = -2.5 + self.position.y + collider.left_top.y
             }
-        )
+        }
+
+        table.insert(par.currentObjectiveTable, 1, movementOrder)
     else
         if
-            (par.pr.surface.can_place_entity {
+            (par.p.surface.can_place_entity {
                 name = self.type,
                 position = targetPos,
                 direction = defines.direction.north,
                 force = par.p.force
             })
          then
-            inventory = par.p.get_inventory(defines.inventory.player_main)
+            inventory = par.p.get_inventory(defines.inventory.character_main)
 
             if inventory.get_item_count(self.type) ~= 0 then
                 inventory.remove({name = self.type, count = 1})
@@ -98,6 +104,7 @@ function BuildStructureObjective:tick(par)
                             limit = 1,
                             collision_mask = "player-layer"
                         }[1]
+
                         table.insert(
                             par.currentObjectiveTable,
                             1,

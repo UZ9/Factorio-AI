@@ -3,7 +3,9 @@ require "objective_walk_to_location"
 
 PathfindToLocationObjective = WalkToLocationObjective:new()
 
-local TILE_RADIUS = 0.3
+
+
+local TILE_RADIUS = 0.01
 
 
 local function round(value)
@@ -20,7 +22,6 @@ local function collidesWith(position, game)
                 collision_mask = "player-layer"
             } == 0
      then
-        game.players[1].print("Found one at " .. tile.position.x .. ", " .. tile.position.y)
         return true
     else
         return false
@@ -41,12 +42,12 @@ local function getChildren(tilePos)
 
     table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y})
     table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x, y = tilePos.y + 1})
-    table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y + 1})
+    --table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y + 1})
     table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y})
     table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x, y = tilePos.y - 1})
-    table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y - 1})
-    table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y - 1})
-    table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y + 1})
+    --table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y - 1})
+    --table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y - 1})
+    --table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y + 1})
 
     return tiles
 end
@@ -152,10 +153,11 @@ function PathfindToLocationObjective:tick(par)
             element = list[i]
             rendering.draw_rectangle {
                 color = {r = 0, g = 1, b = 0, a = 1},
-                filled = true,
+                filled = false,
                 left_top = {element.x, element.y},
                 right_bottom = {element.x + 1, element.y + 1},
-                surface = game.surfaces[1]
+                surface = game.surfaces[1],
+                only_in_alt_mode=true
             }
 
             table.insert(par.currentObjectiveTable, 2, WalkToLocationObjective:new {target = {x = element.x, y = element.y}})

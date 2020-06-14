@@ -3,6 +3,7 @@ require "objective"
 WalkToLocationObjective = Objective:new()
 
 WalkToLocationObjective.target = nil
+WalkToLocationObjective.renderingTile = nil
 
 local TILE_RADIUS = 0.3
 
@@ -15,15 +16,15 @@ local function tablelength(table)
 end
 
 local function getDegrees(player, target, xDist, yDist)
-  if xDist > 0 and yDist >= 0 then 
-    return math.deg(math.atan(xDist/yDist)) + 90 --quadrant 4
-  elseif xDist >= 0 and yDist < 0 then 
-    return math.deg(math.atan(xDist/-yDist)) --quadrant 1
+  if xDist > 0 and yDist >= 0 then
+    return math.deg(math.atan(xDist / yDist)) + 90 --quadrant 4
+  elseif xDist >= 0 and yDist < 0 then
+    return math.deg(math.atan(xDist / -yDist)) --quadrant 1
   elseif xDist <= 0 and yDist > 0 then --quadrant 3
-    return math.deg(math.atan(-xDist/yDist)) + 180
+    return math.deg(math.atan(-xDist / yDist)) + 180
   elseif xDist <= 0 and yDist < 0 then --quadrant 2
-    return math.deg(math.atan(-xDist/-yDist)) + 270
-  else 
+    return math.deg(math.atan(-xDist / -yDist)) + 270
+  else
     return -1
   end
 end
@@ -64,11 +65,22 @@ local function round(value)
 end
 
 function WalkToLocationObjective:finished(par)
+  if self.done == true then
+    if self.renderingTile ~= nil then
+      par.rendering.destroy(self.renderingTile)
+    end
+  end
+
   return self.done == true
 end
 
 function WalkToLocationObjective:tick(par)
-  if self.done == true then return end 
+  if self.done == true then
+    return
+  end
+
+  if self.renderingTile == nil then
+  end
 
   player = par.p
   --player.print("position: " .. player.position.x .. ", " .. player.position.y)
@@ -83,13 +95,12 @@ function WalkToLocationObjective:tick(par)
   yDist = self.target.y - player.position.y + 0.5
 
   if math.abs(xDist) > TILE_RADIUS or math.abs(yDist) > TILE_RADIUS then
-    player.character_running_speed_modifier = 0.1
-    player.walking_state = {walking = true, direction = getDirection(player, self.target, xDist, yDist)}
     --moveTo(player, xDist, yDist, distance)
     --player.print("seems that dist was greater than tile radius (" .. distance .. " > " .. TILE_RADIUS .. ")")
     --getDirection(player, self.target, xDist, yDist)
+    player.character_running_speed_modifier = 0.1
+    player.walking_state = {walking = true, direction = getDirection(player, self.target, xDist, yDist)}
   else
     self.done = true
   end
 end
-

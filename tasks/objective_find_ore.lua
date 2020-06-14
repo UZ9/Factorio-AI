@@ -3,6 +3,8 @@ require "objective_walk_to_location"
 
 FindOreObjective = PathfindToLocationObjective:new()
 
+FindOreObjective.currentRenderingTiles = {}
+
 local TILE_RADIUS = 0.3
 
 local function round(value)
@@ -27,7 +29,11 @@ function collidesWith(position, game)
 end
 
 function FindOreObjective:finished(par)
-    return self.done == true
+    if self.done == true then
+        return true
+    else
+        return false
+    end
 end
 
 function findOre(player, game, entityType)
@@ -64,7 +70,7 @@ function FindOreObjective:tick(par)
 
     if self.target == null then
         foundOre = findOre(par.p, par.game, self.entityType)
-        self.target = PathTile:new{x=math.floor(foundOre.position.x),y=math.floor(foundOre.position.y)}
+        self.target = PathTile:new {x = math.floor(foundOre.position.x), y = math.floor(foundOre.position.y)}
         self.done = true
     end
 
@@ -72,22 +78,27 @@ function FindOreObjective:tick(par)
         game.surfaces[1].count_entities_filtered {
             area = {{x = self.target.x, y = self.target.y}, {x = self.target.x + 1, y = self.target.y + 1}},
             limit = 1,
-            collision_mask="player-layer"
+            collision_mask = "player-layer"
         } == 0
      then
         list = asharp(PathTile:new {x = round(par.p.position.x), y = round(par.p.position.y)}, self.target)
 
         for i = 1, #list do
             element = list[i]
-            rendering.draw_rectangle {
+
+            movementOrder = WalkToLocationObjective:new {target = {x = element.x, y = element.y}}
+
+            movementOrder.renderingTile =
+                par.rendering.draw_rectangle {
                 color = {r = 0, g = 1, b = 0, a = 1},
                 filled = true,
                 left_top = {element.x, element.y},
                 right_bottom = {element.x + 1, element.y + 1},
-                surface = game.surfaces[1]
+                surface = game.surfaces[1],
+                only_in_alt_mode = true
             }
 
-            table.insert(par.currentObjectiveTable, 2, WalkToLocationObjective:new {target = {x = element.x, y = element.y}})
+            table.insert(par.currentObjectiveTable, 2, movementOrder)
         end
 
         self.done = true
@@ -95,6 +106,4 @@ function FindOreObjective:tick(par)
         par.p.print("Invalid Tile")
         self.done = true
     end
-
-
 end
