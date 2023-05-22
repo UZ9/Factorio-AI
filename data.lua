@@ -23,7 +23,7 @@ data:extend(
             icon = "__factorio-ai__/art/ai-pathfinder.png",
             collision_box = {{-0.4, -0.4}, {0.4, 0.4}},
             distance_per_frame = 10,
-            pollution_to_join_attack = 10000000000000000000000000000000000000000000,
+            pollution_to_join_attack = 10000000000000000000000000000000,
             distraction_cooldown = 4294967295,
             movement_speed = 0.5,
             vision_distance = 0,

@@ -3,7 +3,7 @@
 local aiArmor = table.deepcopy(data.raw.armor["light-armor"])
 
 aiArmor.name = "ai-armor"
-aiArmor.icon= "__factorio-ai__/art/ai-pathfinder.png"
+-- aiArmor.icon= aiArmordww
 
 aiArmor.resistances = {
    {

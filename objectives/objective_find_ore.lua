@@ -12,15 +12,15 @@ local function round(value)
 end
 
 function collidesWith(position, game)
-    tile = game.surfaces[1].get_tile {x = position.x, y = position.y}
+    tile = game.surfaces[1].get_tile { x = position.x, y = position.y }
     if
         tile.collides_with("player-layer") == false and
-            game.surfaces[1].count_entities_filtered {
-                area = {tile.position, {x = tile.position.x + 1, y = tile.position.y + 1}},
-                limit = 1,
-                collision_mask = "player-layer"
-            } == 0
-     then
+        game.surfaces[1].count_entities_filtered {
+            area = { tile.position, { x = tile.position.x + 1, y = tile.position.y + 1 } },
+            limit = 1,
+            collision_mask = "player-layer"
+        } == 0
+    then
         game.players[1].print("Found one at " .. tile.position.x .. ", " .. tile.position.y)
         return true
     else
@@ -29,6 +29,13 @@ function collidesWith(position, game)
 end
 
 function FindOreObjective:finished(par)
+    par.p.print("we done now")
+
+    if self.tag then
+        par.p.print("tag is " .. self.tag)
+    else
+        par.p.print("no tag")
+    end
     if self.done == true then
         return true
     else
@@ -46,12 +53,12 @@ function findOre(player, game, entityType)
     while foundEntity == nil do
         foundEntities =
             game.surfaces[1].find_entities_filtered {
-            area = {
-                {x = player.position.x - searchSize, y = player.position.y - searchSize},
-                {x = player.position.x + searchSize, y = player.position.y + searchSize}
-            },
-            name = entityType
-        }
+                area = {
+                    { x = player.position.x - searchSize, y = player.position.y - searchSize },
+                    { x = player.position.x + searchSize, y = player.position.y + searchSize }
+                },
+                name = entityType
+            }
 
         for i = 1, #foundEntities do
             if collidesWith(foundEntities[i].position, game) == true then
@@ -70,36 +77,54 @@ function FindOreObjective:tick(par)
 
     if self.target == null then
         foundOre = findOre(par.p, par.game, self.entityType)
-        self.target = PathTile:new {x = math.floor(foundOre.position.x), y = math.floor(foundOre.position.y)}
+        self.target = PathTile:new { x = math.floor(foundOre.position.x), y = math.floor(foundOre.position.y) }
         self.done = true
     end
 
     if
         game.surfaces[1].count_entities_filtered {
-            area = {{x = self.target.x, y = self.target.y}, {x = self.target.x + 1, y = self.target.y + 1}},
+            area = { { x = self.target.x, y = self.target.y }, { x = self.target.x + 1, y = self.target.y + 1 } },
             limit = 1,
             collision_mask = "player-layer"
         } == 0
-     then
-        list = asharp(PathTile:new {x = round(par.p.position.x), y = round(par.p.position.y)}, self.target)
+    then
+        list = asharp(PathTile:new { x = round(par.p.position.x), y = round(par.p.position.y) }, self.target)
+
+
+        par.p.print(#list)
+
 
         for i = 1, #list do
             element = list[i]
 
-            movementOrder = WalkToLocationObjective:new {target = {x = element.x, y = element.y}}
+            movementOrder = WalkToLocationObjective:new { target = { x = element.x, y = element.y } }
+
 
             movementOrder.renderingTile =
                 par.rendering.draw_rectangle {
-                color = {r = 0, g = 1, b = 0, a = 1},
-                filled = true,
-                left_top = {element.x, element.y},
-                right_bottom = {element.x + 1, element.y + 1},
-                surface = game.surfaces[1],
-                only_in_alt_mode = true
-            }
+                    color = { r = 0, g = 1, b = 0, a = 1 },
+                    filled = true,
+                    left_top = { element.x, element.y },
+                    right_bottom = { element.x + 1, element.y + 1 },
+                    surface = game.surfaces[1],
+                    only_in_alt_mode = true
+                }
 
+            if i == 1 then
+                par.p.print("Assigning")
+                par.p.print(self.tag)
+                movementOrder.tag = self.tag
+                self.tag = nil
+            end
+
+            par.p.print(self.tag)
+
+            if movementOrder.tag then
+                par.p.print(i .. " is " .. movementOrder.tag)
+            end
             table.insert(par.currentObjectiveTable, 2, movementOrder)
         end
+
 
         self.done = true
     else

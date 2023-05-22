@@ -42,12 +42,12 @@ local function getChildren(tilePos)
 
     table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y})
     table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x, y = tilePos.y + 1})
-    --table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y + 1})
+    table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y + 1})
     table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y})
     table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x, y = tilePos.y - 1})
-    --table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y - 1})
-    --table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y - 1})
-    --table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y + 1})
+    table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y - 1})
+    table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x + 1, y = tilePos.y - 1})
+    table.insert(tiles, PathTile:new {parent = tilePos, x = tilePos.x - 1, y = tilePos.y + 1})
 
     return tiles
 end
@@ -147,10 +147,13 @@ function PathfindToLocationObjective:tick(par)
             collision_mask="player-layer"
         } == 0
      then
+        player.print("Calculating astar")
+
         list = asharp(PathTile:new {x = round(par.p.position.x), y = round(par.p.position.y)}, self.target)
 
         for i = 1, #list do
             element = list[i]
+            player.print("Drawing rectangle")
             rendering.draw_rectangle {
                 color = {r = 0, g = 1, b = 0, a = 1},
                 filled = false,

@@ -4,7 +4,7 @@ MineResourcesObjective = Objective:new()
 
 
 function MineResourcesObjective:finished(par)
-  return par.p.get_inventory(defines.inventory.character_main).get_item_count(self.type) > self.amount
+  return par.p.get_inventory(defines.inventory.character_main).get_item_count(self.type) >= self.amount
 end
 
 function MineResourcesObjective:tick(par)

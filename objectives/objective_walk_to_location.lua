@@ -64,7 +64,17 @@ local function round(value)
   return math.floor(value + 0.5)
 end
 
+local xDist = 0
+local yDist = 0
+
 function WalkToLocationObjective:finished(par)
+  player = par.p
+
+  xDist = self.target.x - player.position.x + 0.5
+  yDist = self.target.y - player.position.y + 0.5
+
+  self.done = not (math.abs(xDist) > TILE_RADIUS or math.abs(yDist) > TILE_RADIUS)
+
   if self.done == true then
     if self.renderingTile ~= nil then
       par.rendering.destroy(self.renderingTile)
@@ -82,6 +92,9 @@ function WalkToLocationObjective:tick(par)
   if self.renderingTile == nil then
   end
 
+
+  -- self.renderingTile()
+
   player = par.p
   --player.print("position: " .. player.position.x .. ", " .. player.position.y)
 
@@ -91,10 +104,9 @@ function WalkToLocationObjective:tick(par)
       math.pow(math.abs(player.position.y - (self.target.y + 0.5)), 2)
   )
 
-  xDist = self.target.x - player.position.x + 0.5
-  yDist = self.target.y - player.position.y + 0.5
 
-  if math.abs(xDist) > TILE_RADIUS or math.abs(yDist) > TILE_RADIUS then
+
+  if not self.done then
     --moveTo(player, xDist, yDist, distance)
     --player.print("seems that dist was greater than tile radius (" .. distance .. " > " .. TILE_RADIUS .. ")")
     --getDirection(player, self.target, xDist, yDist)
