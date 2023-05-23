@@ -140,6 +140,25 @@ function PathfindToLocationObjective:tick(par)
         return
     end
 
+    if self.position == nil then
+        if type(self.target) == "table" then
+            self.position = {
+                x = math.floor(par.p.position.x) + self.target.x,
+                y = math.floor(par.p.position.y) + self.target.y
+            }
+        else
+            -- print(par.previous_positions)
+            -- print(self.target)
+
+            self.position = {
+                x = par.previous_positions[self.target].x,
+                y = par.previous_positions[self.target].y
+            }
+        end
+    end
+
+    self.target = self.position
+
     if
         game.surfaces[1].count_entities_filtered {
             area = {{x = self.target.x, y = self.target.y}, {x = self.target.x + 1, y = self.target.y + 1}},

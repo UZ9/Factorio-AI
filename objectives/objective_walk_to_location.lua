@@ -67,6 +67,10 @@ end
 local xDist = 0
 local yDist = 0
 
+function WalkToLocationObjective:get_name()
+  return "WalkToLocation: " .. serpent.block(self.target)
+end
+
 function WalkToLocationObjective:finished(par)
   player = par.p
 

@@ -8,6 +8,10 @@ function MineEntityObjective:finished(par)
   return self.done == true
 end
 
+function MineEntityObjective:get_name()
+    return "Mining " .. self.target
+end
+
 function MineEntityObjective:tick(par)
     if self.target ~= nil then 
         par.p.mining_state={mining=true, position=target.position}

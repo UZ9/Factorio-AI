@@ -20,12 +20,22 @@ function BuildStructureObjective:finished(par)
 end
 
 function BuildStructureObjective:tick(par)
+
     if self.position == nil then
-        self.position = {
-            x = math.floor(par.p.position.x) + self.target.x,
-            y = math.floor(par.p.position.y) + self.target.y
-        }
+        if type(self.target) == "table" then
+            self.position = {
+                x = math.floor(par.p.position.x) + self.target.x,
+                y = math.floor(par.p.position.y) + self.target.y
+            }
+        else
+            self.position = {
+                x = par.previous_positions[self.target].x,
+                y = par.previous_positions[self.target].y
+            }
+        end
     end
+
+    par.p.print(type(self.target))
 
     targetPos = self.position
 
