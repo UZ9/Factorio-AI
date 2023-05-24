@@ -93,14 +93,7 @@ function WalkToLocationObjective:tick(par)
     return
   end
 
-  if self.renderingTile == nil then
-  end
-
-
-  -- self.renderingTile()
-
   player = par.p
-  --player.print("position: " .. player.position.x .. ", " .. player.position.y)
 
   distance =
     math.sqrt(
@@ -111,9 +104,6 @@ function WalkToLocationObjective:tick(par)
 
 
   if not self.done then
-    --moveTo(player, xDist, yDist, distance)
-    --player.print("seems that dist was greater than tile radius (" .. distance .. " > " .. TILE_RADIUS .. ")")
-    --getDirection(player, self.target, xDist, yDist)
     player.character_running_speed_modifier = 0.1
     player.walking_state = {walking = true, direction = getDirection(player, self.target, xDist, yDist)}
   else

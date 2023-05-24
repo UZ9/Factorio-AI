@@ -28,13 +28,6 @@ function collidesWith(position, game)
 end
 
 function FindOreObjective:finished(par)
-    par.p.print("we done now")
-
-    if self.tag then
-        par.p.print("tag is " .. self.tag)
-    else
-        par.p.print("no tag")
-    end
     if self.done == true then
         return true
     else
@@ -129,18 +122,8 @@ function FindOreObjective:tick(par)
     end
 
     if self.target == null then
-        par.p.print("Findingingingg")
-
         orePatch = self:findOrePatch(par)
         foundOrePatch = orePatch.foundEntities
-
-
-        par.p.print("Amount of in ore patch")
-        par.p.print(#foundOrePatch)
-        par.p.print(orePatch.minX)
-        par.p.print(orePatch.maxX)
-
-
 
         for i = 1, #foundOrePatch do
             element = foundOrePatch[i].position
@@ -203,8 +186,6 @@ function FindOreObjective:tick(par)
                 y = orePatch.minY + math.ceil((orePatch.maxY - orePatch.minY) / 2.0) }
         }
 
-        par.p.print(#orePatch.foundEntities)
-
         for entityIndex = 1, #orePatch.foundEntities do
             local orePatchPos = orePatch.foundEntities[entityIndex].position
             local centerPos = par.previous_positions[self.entityType][1].center
@@ -213,8 +194,6 @@ function FindOreObjective:tick(par)
 
             if (distPos.x == 0 and distPos.y == 0) then 
                 foundOre = orePatch.foundEntities[entityIndex]
-
-                par.p.print("FOUND ORE")
 
                 self.target = PathTile:new { x = math.floor(foundOre.position.x), y = math.floor(foundOre.position.y) }
                 self.done = true
@@ -244,10 +223,6 @@ function FindOreObjective:tick(par)
     then
         list = asharp(PathTile:new { x = round(par.p.position.x), y = round(par.p.position.y) }, self.target)
 
-
-        par.p.print(#list)
-
-
         for i = 1, #list do
             element = list[i]
 
@@ -264,17 +239,10 @@ function FindOreObjective:tick(par)
             }
 
             if i == 1 then
-                par.p.print("Assigning")
-                par.p.print(self.tag)
                 movementOrder.tag = self.tag
                 self.tag = nil
             end
 
-            par.p.print(self.tag)
-
-            if movementOrder.tag then
-                par.p.print(i .. " is " .. movementOrder.tag)
-            end
             table.insert(par.currentObjectiveTable, 2, movementOrder)
         end
 

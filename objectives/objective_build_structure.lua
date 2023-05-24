@@ -36,8 +36,6 @@ function BuildStructureObjective:tick(par)
         end
     end
 
-    par.p.print(type(self.target))
-
     targetPos = self.position
 
     if

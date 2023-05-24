@@ -26,8 +26,6 @@ function RetrieveFromEntityObjective:tick(par)
 
     local itemCount = inventory.get_item_count(self.to_retrieve.name)
 
-    par.p.print(itemCount)
-
     if itemCount > self.minThresh then 
       local item_stack = { name=self.to_retrieve.name, count=itemCount - self.minThresh }
 

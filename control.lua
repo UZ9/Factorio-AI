@@ -90,9 +90,6 @@ script.on_event(
           if currentObjective[1] then
             if currentObjective[1]:finished { event = e, p = player, currentObjectiveTable = currentObjective, game =
             game, rendering = rendering } then
-              player.print("Finished Task")
-
-
               currentObjective[1]:cleanup { rendering = rendering, previous_positions = previous_positions, p = player }
               table.remove(currentObjective, 1)
 
@@ -101,12 +98,6 @@ script.on_event(
                 currentObjective[1]:tick { event = e, p = player, previous_positions = previous_positions,
                   currentObjectiveTable =
                   currentObjective, game = game, rendering = rendering }
-              end
-
-
-
-              if #previous_positions > 0 then
-                player.print("YEET")
               end
             else
               currentObjective[1]:tick { event = e, previous_positions = previous_positions, p = player,
