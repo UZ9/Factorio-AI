@@ -14,7 +14,6 @@ function ClearEnvironmentObjective:tick(par)
     for i=1, #entities do 
         element = entities[i]
         table.insert(par.currentObjectiveTable, 2, MineEntityObjective:new {target = {x = element.x, y = element.y}})
-        
     end
 
     self.done = true

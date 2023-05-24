@@ -39,5 +39,8 @@ function Objective:cleanup(par)
             surface = game.surfaces[1],
             only_in_alt_mode = true
         }
+
+        par.rendering.draw_text { text = self.tag, target = newPos, surface = game.surfaces[1], only_in_alt_mode = true,
+            color = { r = 1, g = 1, b = 1, a = 1 } }
     end
 end

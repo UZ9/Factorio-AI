@@ -1,5 +1,6 @@
 --control.lua
 require "objectives/objective"
+require "objectives/objective_retrieve_from_entity"
 require "path_tile"
 require "objectives/objective_walk_to_location"
 require "objectives/objective_pathfind_to_location"
@@ -7,6 +8,7 @@ require "objectives/objective_find_ore"
 require "objectives/objective_build_structure"
 require "objectives/objective_mine_resources"
 require "objectives/objective_insert_materials"
+require "objectives/objective_craft_items.lua"
 
 local SEARCH_OFFSET = 1
 local GLOBAL_SURFACE_MAP = { { -32, -32 }, { 32, 32 } }
@@ -22,17 +24,31 @@ local done = false
 
 local previous_positions = {}
 
+
 local currentObjective = {
   FindOreObjective:new { entityType = "iron-ore" },
   BuildStructureObjective:new { type = "burner-mining-drill", target = { x = 0, y = 0 } }, --target is relative to player position
   BuildStructureObjective:new { type = "stone-furnace", target = { x = 1, y = 1 }, tag = "initial-burner" },
-  FindOreObjective:new { entityType = "coal", tag = "coal-deposit-1" },
+  FindOreObjective:new { center = true, entityType = "coal", tag = "coal-deposit-1" },
   MineResourcesObjective:new {type = "coal", amount = 10},
-
   PathfindToLocationObjective:new { previous_positions = previous_positions, target = "initial-burner" },
   InsertMaterialsObjective:new { to_insert = { name = "coal", count = 5 }, target = "stone-furnace" },
   InsertMaterialsObjective:new { to_insert = { name = "coal", count = 5 }, target = "burner-mining-drill" },
-  InsertMaterialsObjective:new { to_insert = { name = "coal", count = 5 }, target = "stone-furnace" }
+  RetrieveFromEntityObjective:new { to_retrieve = { name = "iron-plate", count = 18 }, target = "stone-furnace" },
+
+  FindOreObjective:new { entityType = "stone", tag = "stone-deposit-1" },
+  MineResourcesObjective:new {type = "stone", amount = 30},
+  CraftItemsObjective:new { recipe = "stone-furnace", count = 6 },
+  CraftItemsObjective:new { recipe = "burner-mining-drill", count = 2 },
+
+  PathfindToLocationObjective:new { previous_positions = previous_positions, target = "coal-deposit-1" },
+  BuildStructureObjective:new { type = "burner-mining-drill", direction = defines.direction.north, target = { x = 0, y = 0 } }, --target is relative to player position
+  BuildStructureObjective:new { type = "burner-mining-drill", direction = defines.direction.south, target = { x = 1, y = 1 }, tag = "initial-coal" },
+
+  InsertMaterialsObjective:new { to_insert = { name = "wood", count = 1 }, target = "burner-mining-drill" },
+
+
+
 }
 
 local entity
@@ -42,6 +58,9 @@ local line
 local asharp = false
 
 
+local function initialize()
+
+end
 
 script.on_event(
   { defines.events.on_tick },
@@ -57,16 +76,15 @@ script.on_event(
       for index, player in pairs(game.connected_players) do
         if init_armor == 1 then
           player.begin_crafting { count = 1, recipe = "ai-armor" }
-
+          initialize()
           init_armor = 0
         end
-        if
-            player.character and
+        if player.character and
             player.get_inventory(defines.inventory.character_armor).get_item_count("ai-armor") > 0
         then
           if currentObjective[1] then
             if currentObjective[1]:finished { event = e, p = player, currentObjectiveTable = currentObjective, game =
-                game, rendering = rendering } then
+            game, rendering = rendering } then
               player.print("Finished Task")
 
 
@@ -75,8 +93,9 @@ script.on_event(
 
               if (currentObjective[1]) then
                 player.set_goal_description(currentObjective[1]:get_name(), true)
-                currentObjective[1]:tick { event = e, p = player, previous_positions = previous_positions, currentObjectiveTable =
-                currentObjective, game = game, rendering = rendering }
+                currentObjective[1]:tick { event = e, p = player, previous_positions = previous_positions,
+                  currentObjectiveTable =
+                  currentObjective, game = game, rendering = rendering }
               end
 
 
@@ -85,8 +104,9 @@ script.on_event(
                 player.print("YEET")
               end
             else
-              currentObjective[1]:tick { event = e, previous_positions = previous_positions, p = player, currentObjectiveTable =
-              currentObjective, game = game, rendering = rendering }
+              currentObjective[1]:tick { event = e, previous_positions = previous_positions, p = player,
+                currentObjectiveTable =
+                currentObjective, game = game, rendering = rendering }
             end
           else
             player.print("Finished All Tasks")

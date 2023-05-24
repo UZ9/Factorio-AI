@@ -7,6 +7,7 @@ BuildStructureObjective.target = nil
 BuildStructureObjective.position = nil --temporary workaround until I find a better solution that doesn't use target AND position
 BuildStructureObjective.type = nil
 BuildStructureObjective.entity = nil
+BuildStructureObjective.direction = defines.direction.north
 
 local function isPlayerInBox(playerPos, playerBox, targetPos, targetBox)
     return playerPos.x + playerBox.left_top.x <= targetPos.x + targetBox.right_bottom.x and
@@ -98,7 +99,7 @@ function BuildStructureObjective:tick(par)
                     player.surface.create_entity {
                     name = self.type,
                     position = targetPos,
-                    direction = defines.direction.north,
+                    direction = self.direction,
                     force = player.force
                 }
 
