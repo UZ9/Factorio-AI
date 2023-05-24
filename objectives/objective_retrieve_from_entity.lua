@@ -2,6 +2,8 @@ require "objective"
 
 RetrieveFromEntityObjective = Objective:new()
 
+RetrieveFromEntityObjective.minThresh = 0
+
 
 function RetrieveFromEntityObjective:finished(par)
   return par.p.get_inventory(defines.inventory.character_main).get_item_count(self.to_retrieve.name) >= self.to_retrieve.count
@@ -14,8 +16,8 @@ end
 function RetrieveFromEntityObjective:tick(par)
 
     targetEntity = par.p.surface.find_entities_filtered {
-      position = par.p.position,
-      radius = 10,
+      position = { x = par.p.position.x + self.targetPos.x, y = par.p.position.y + self.targetPos.y },
+      radius = 1,
       limit = 1,
       name = self.target,
     }[1]
@@ -26,8 +28,8 @@ function RetrieveFromEntityObjective:tick(par)
 
     par.p.print(itemCount)
 
-    if itemCount > 0 then 
-      local item_stack = { name=self.to_retrieve.name, count=itemCount }
+    if itemCount > self.minThresh then 
+      local item_stack = { name=self.to_retrieve.name, count=itemCount - self.minThresh }
 
       par.p.get_inventory(defines.inventory.character_main).insert(item_stack)
       inventory.remove(item_stack)

@@ -30,23 +30,28 @@ local currentObjective = {
   BuildStructureObjective:new { type = "burner-mining-drill", target = { x = 0, y = 0 } }, --target is relative to player position
   BuildStructureObjective:new { type = "stone-furnace", target = { x = 1, y = 1 }, tag = "initial-burner" },
   FindOreObjective:new { center = true, entityType = "coal", tag = "coal-deposit-1" },
-  MineResourcesObjective:new {type = "coal", amount = 10},
+  MineResourcesObjective:new { type = "coal", amount = 10 },
   PathfindToLocationObjective:new { previous_positions = previous_positions, target = "initial-burner" },
   InsertMaterialsObjective:new { to_insert = { name = "coal", count = 5 }, target = "stone-furnace" },
   InsertMaterialsObjective:new { to_insert = { name = "coal", count = 5 }, target = "burner-mining-drill" },
-  RetrieveFromEntityObjective:new { to_retrieve = { name = "iron-plate", count = 18 }, target = "stone-furnace" },
+  RetrieveFromEntityObjective:new { targetPos = { x = 0, y = 2 }, to_retrieve = { name = "iron-plate", count = 18 },
+    target = "stone-furnace" },
 
   FindOreObjective:new { entityType = "stone", tag = "stone-deposit-1" },
-  MineResourcesObjective:new {type = "stone", amount = 30},
+  MineResourcesObjective:new { type = "stone", amount = 30 },
   CraftItemsObjective:new { recipe = "stone-furnace", count = 6 },
   CraftItemsObjective:new { recipe = "burner-mining-drill", count = 2 },
 
   PathfindToLocationObjective:new { previous_positions = previous_positions, target = "coal-deposit-1" },
-  BuildStructureObjective:new { type = "burner-mining-drill", direction = defines.direction.north, target = { x = 0, y = 0 } }, --target is relative to player position
-  BuildStructureObjective:new { type = "burner-mining-drill", direction = defines.direction.south, target = { x = 1, y = 1 }, tag = "initial-coal" },
+  BuildStructureObjective:new { type = "burner-mining-drill", direction = defines.direction.north,
+    target = { x = 0, y = 0 } }, --target is relative to player position
+  BuildStructureObjective:new { type = "burner-mining-drill", direction = defines.direction.south,
+    target = { x = 1, y = 1 }, tag = "initial-coal" },
 
   InsertMaterialsObjective:new { to_insert = { name = "wood", count = 1 }, target = "burner-mining-drill" },
 
+  RetrieveFromEntityObjective:new { minThresh = 1, targetPos = { x = 0, y = 2 },
+    to_retrieve = { name = "coal", count = 20 }, target = "burner-mining-drill" },
 
 
 }
