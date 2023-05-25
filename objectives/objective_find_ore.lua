@@ -38,6 +38,10 @@ end
 function FindOreObjective:findOrePatch(par)
     foundOre = findOre(par.p, par.game, self.entityType)
 
+    if foundOre == nil then 
+        return nil 
+    end
+
     searchSize = 1
 
     local foundEntity = nil
@@ -98,6 +102,10 @@ function findOre(player, game, entityType)
     count = 0
 
     while foundEntity == nil do
+        if searchSize > 1000 then 
+            return nil
+        end
+
         foundEntities = game.surfaces[1].find_entities_filtered {
             area = {
                 { x = player.position.x - searchSize, y = player.position.y - searchSize },
@@ -123,7 +131,16 @@ function FindOreObjective:tick(par)
 
     if self.target == null then
         orePatch = self:findOrePatch(par)
+        
+        if orePatch == nil then 
+            par.p.print("No ore patch found with type " .. self.entityType)
+            self.done = true
+            return
+        end
+
         foundOrePatch = orePatch.foundEntities
+
+        
 
         for i = 1, #foundOrePatch do
             element = foundOrePatch[i].position

@@ -26,16 +26,24 @@ local done = false
 
 local previous_positions = {}
 
+local currentObjective = {}
 
-local currentObjective = {
+local buildTest = {
+  BuildStructureObjective:new { type = "burner-mining-drill", target = { x = 0, y = 0 } }, --target is relative to player position
+  BuildStructureObjective:new { type = "stone-furnace", target = { x = 1, y = 1 }, tag = "initial-burner" },
+}
+
+local fullObjectives = {
   FindOreObjective:new { entityType = "iron-ore" },
   BuildStructureObjective:new { type = "burner-mining-drill", target = { x = 0, y = 0 } }, --target is relative to player position
   BuildStructureObjective:new { type = "stone-furnace", target = { x = 1, y = 1 }, tag = "initial-burner" },
   FindOreObjective:new { center = true, entityType = "coal", tag = "coal-deposit-1" },
   MineResourcesObjective:new { type = "coal", amount = 10 },
   PathfindToLocationObjective:new { previous_positions = previous_positions, target = "initial-burner" },
-  InsertMaterialsObjective:new { to_insert = { name = "coal", count = 5 }, target = "stone-furnace" },
-  InsertMaterialsObjective:new { to_insert = { name = "coal", count = 5 }, target = "burner-mining-drill" },
+  InsertMaterialsObjective:new { targetPos = { x = 0, y = 0 }, to_insert = { name = "coal", count = 5 },
+    target = "stone-furnace" },
+  InsertMaterialsObjective:new { targetPos = { x = 0, y = -2 }, to_insert = { name = "coal", count = 5 },
+    target = "burner-mining-drill" },
   RetrieveFromEntityObjective:new { targetPos = { x = 0, y = 2 }, to_retrieve = { name = "iron-plate", count = 18 },
     target = "stone-furnace" },
 
@@ -75,11 +83,16 @@ local currentObjective = {
   WaitForAsyncObjective:new {},
 
   BuildStructureObjective:new { type = "burner-mining-drill", direction = defines.direction.east,
-    target = { x = 0, y = 0 } }, --target is relative to player position
+    target = { x = -1, y = 0 } }, --target is relative to player position
+  BuildStructureObjective:new { type = "iron-chest", direction = defines.direction.east,
+    target = { x = 0, y = -1 } },
   BuildStructureObjective:new { type = "burner-mining-drill", direction = defines.direction.west,
-    target = { x = 4, y = -1 } },
-  BuildStructureObjective:new { type = "iron-chest", direction = defines.direction.west,
-    target = { x = 3, y = 0 } },
+    target = { x = 2, y = -1 } },
+
+  InsertMaterialsObjective:new { targetPos = { x = -1, y = 0 }, to_insert = { name = "coal", count = 5 },
+    target = "stone-furnace" },
+  InsertMaterialsObjective:new { targetPos = { x = 2, y = -1 }, to_insert = { name = "coal", count = 5 },
+    target = "stone-furnace" },
 
 }
 
@@ -91,8 +104,21 @@ local line
 
 local asharp = false
 
+local MODE_FULL = 0
+local MODE_BUILD_TEST = 1
+local MODE_PATHFIND_TEST = 2
+
+local mode = MODE_BUILD_TEST
 
 local function initialize()
+  if mode == MODE_FULL then
+    currentObjective = fullObjectives
+  elseif mode == MODE_BUILD_TEST then
+    currentObjective = buildTest
+  end
+
+
+
 
 end
 
@@ -109,9 +135,23 @@ script.on_event(
       end
       for index, player in pairs(game.connected_players) do
         if init_armor == 1 then
-          player.begin_crafting { count = 1, recipe = "ai-armor" }
+          -- player.begin_crafting { count = 1, recipe = "ai-armor" }
           initialize()
           init_armor = 0
+
+          local bp_entity = game.surfaces[1].create_entity { name = 'item-on-ground', position = { x = 0, y = 0 },
+            stack = 'blueprint' }
+
+          local bp_string = "0eNqVkttqwzAMht9F13ZJnKaHvEoZJQetCBw52M5oCH732Q2Msq1bcifJ6Pt/WZqh0SMOlthDNQO1hh1Ulxkc3bjWqeanAaEC8tiDAK77lHlbsxuM9bJB7SEIIO7wDlUexL/NzWgZreyJiW+ys6T1E0GFNwHInjzh4uWRTFce+wZtlHjlQsBgXGwznKQjSqpdKWCKQbEro0JHFtvlXSWf38BqPTjbBC7Wg/NN4P0X2HnDKN/jz9Yt/uRmC1SFXyDlanfbpj78ufAXFrOQ1v+4l+rpNgV8oHWL1CnfH8/qeDir7FTEiT4B/k7ptw=="
+          bp_entity.stack.import_stack(bp_string)
+
+          bp_entity.stack.build_blueprint {
+            surface = game.surfaces[1],
+            force = player.force,
+            position = { x = 0, y = 0 }
+          }
+
+          bp_entity.destroy()
         end
         if player.character and
             player.get_inventory(defines.inventory.character_armor).get_item_count("ai-armor") > 0
@@ -126,15 +166,12 @@ script.on_event(
                   p = player }
 
                 async_objectives[i] = nil
-
               else
                 async_objectives[i]:tick { event = e, previous_positions = previous_positions, p = player,
                   currentObjectiveTable =
                   currentObjective, game = game, rendering = rendering }
               end
-
             end
-
           end
 
           async_objectives = removeNil(async_objectives)
@@ -168,8 +205,9 @@ script.on_event(
               end
             end
           else
-            player.print("Finished All Tasks")
-            done = true
+            player.set_goal_description("No current objective", true)
+            -- player.print("Finished All Tasks")
+            -- done = true
           end
         else
           player.color = { r = 255, g = 140, b = 0, a = 1 }

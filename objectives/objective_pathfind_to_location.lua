@@ -70,8 +70,17 @@ function asharp(startPos, endPos)
 
     table.insert(openList, startPos)
 
+    local current_iteration = 0
+
 
     while next(openList) ~= nil do
+        if current_iteration > 100 then
+            return nil
+        end
+
+        print(current_iteration)
+
+        current_iteration = current_iteration + 1
         --log(#openList)
         currentNode = openList[1]
         currentIndex = 1
@@ -169,6 +178,12 @@ function PathfindToLocationObjective:tick(par)
         player.print("Calculating astar")
 
         list = asharp(PathTile:new {x = round(par.p.position.x), y = round(par.p.position.y)}, self.target)
+
+        if list == nil then 
+            player.print("Exceeded pathfinding step count")
+            self.done = true 
+            return
+        end
 
         for i = 1, #list do
             element = list[i]

@@ -14,8 +14,8 @@ end
 function InsertMaterialsObjective:tick(par)
 
   targetEntity = par.p.surface.find_entities_filtered {
-    position = par.p.position,
-    radius = 10,
+    position = { x = par.p.position.x + self.targetPos.x, y = par.p.position.y + self.targetPos.y },
+    radius = 1,
     limit = 1,
     name = self.target,
   }[1]
