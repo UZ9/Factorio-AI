@@ -9,20 +9,12 @@ require "objectives/objective_build_structure"
 require "objectives/objective_mine_resources"
 require "objectives/objective_insert_materials"
 require "objectives/objective_craft_items.lua"
-require "util/util"
 require "objectives/objective_wait_for_async.lua"
 require "goals/goal_recipe"
 
-local SEARCH_OFFSET = 1
-local GLOBAL_SURFACE_MAP = { { -32, -32 }, { 32, 32 } }
+local utility = require "util/util"
+
 local init_armor = 1
-local init_scan = 1
-local map_width = 256
-local map_height = 256
-local moveDiagonal = 1
-local moveHorizontal = 0
-local moveVertical = 0
-local success_flag = 0
 local done = false
 
 local previous_positions = {}
@@ -117,7 +109,7 @@ local function initialize(player, game)
     currentObjective = fullObjectives
   elseif mode == MODE_BUILD_TEST then
     currentObjective = buildTest
-  else 
+  else
     player.print(current_goal.recipe)
 
     player.set_goal_description(current_goal.recipe, true)
@@ -126,10 +118,6 @@ local function initialize(player, game)
 
     currentObjective = oreTest
   end
-
-
-
-
 end
 
 script.on_event(
@@ -149,19 +137,7 @@ script.on_event(
           initialize(player, game)
           init_armor = 0
 
-          local bp_entity = game.surfaces[1].create_entity { name = 'item-on-ground', position = { x = 0, y = 0 },
-            stack = 'blueprint' }
 
-          local bp_string = "0eNqVkttqwzAMht9F13ZJnKaHvEoZJQetCBw52M5oCH732Q2Msq1bcifJ6Pt/WZqh0SMOlthDNQO1hh1Ulxkc3bjWqeanAaEC8tiDAK77lHlbsxuM9bJB7SEIIO7wDlUexL/NzWgZreyJiW+ys6T1E0GFNwHInjzh4uWRTFce+wZtlHjlQsBgXGwznKQjSqpdKWCKQbEro0JHFtvlXSWf38BqPTjbBC7Wg/NN4P0X2HnDKN/jz9Yt/uRmC1SFXyDlanfbpj78ufAXFrOQ1v+4l+rpNgV8oHWL1CnfH8/qeDir7FTEiT4B/k7ptw=="
-          bp_entity.stack.import_stack(bp_string)
-
-          bp_entity.stack.build_blueprint {
-            surface = game.surfaces[1],
-            force = player.force,
-            position = { x = 0, y = 0 }
-          }
-
-          bp_entity.destroy()
         end
         if player.character and
             player.get_inventory(defines.inventory.character_armor).get_item_count("ai-armor") > 0
@@ -184,7 +160,7 @@ script.on_event(
             end
           end
 
-          async_objectives = removeNil(async_objectives)
+          async_objectives = utility:remove_nil(async_objectives)
 
           if currentObjective[1] then
             if currentObjective[1].asyncTask == true then
@@ -216,13 +192,9 @@ script.on_event(
             end
           else
             player.set_goal_description("No current objective", true)
-            -- player.print("Finished All Tasks")
-            -- done = true
           end
         else
           player.color = { r = 255, g = 140, b = 0, a = 1 }
-          --player.character_running_speed_modifier = 0
-          ironCount = 0
         end
       end
     end
