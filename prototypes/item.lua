@@ -31,7 +31,8 @@ aiArmor.resistances = {
 local recipe = table.deepcopy(data.raw.recipe["light-armor"])
 recipe.enabled = true
 recipe.name = "ai-armor"
-recipe.ingredients = {{"iron-plate",1}}
+recipe.energy_required = 0.1
+recipe.ingredients = {}
 recipe.result = "ai-armor"
 
 data:extend{aiArmor,recipe}

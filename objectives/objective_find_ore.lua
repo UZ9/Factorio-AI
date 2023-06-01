@@ -1,12 +1,12 @@
 require "objective"
 require "objective_walk_to_location"
+require "zones/zone"
+require "zones/zone_ore"
 
 FindOreObjective = PathfindToLocationObjective:new()
 
 FindOreObjective.currentRenderingTiles = {}
 FindOreObjective.center = false
-
-local TILE_RADIUS = 0.3
 
 local function round(value)
     return math.floor(value + 0.5)
@@ -28,25 +28,21 @@ function collidesWith(position, game)
 end
 
 function FindOreObjective:finished(par)
-    if self.done == true then
-        return true
-    else
-        return false
-    end
+    return self.done
 end
 
 function FindOreObjective:findOrePatch(par)
-    foundOre = findOre(par.p, par.game, self.entityType)
+    local foundOre = findOre(par.p, par.game, self.entityType)
 
-    if foundOre == nil then 
-        return nil 
+    if foundOre == nil then
+        return nil
     end
 
-    searchSize = 1
+    local searchSize = 1
 
     local foundEntity = nil
 
-    count = 0
+    local count = 0
 
     local found_layer = false
     local foundEntities = {}
@@ -102,7 +98,7 @@ function findOre(player, game, entityType)
     count = 0
 
     while foundEntity == nil do
-        if searchSize > 1000 then 
+        if searchSize > 1000 then
             return nil
         end
 
@@ -131,105 +127,35 @@ function FindOreObjective:tick(par)
 
     if self.target == null then
         orePatch = self:findOrePatch(par)
-        
-        if orePatch == nil then 
+
+        if orePatch == nil then
             par.p.print("No ore patch found with type " .. self.entityType)
             self.done = true
             return
         end
 
-        foundOrePatch = orePatch.foundEntities
+        local zone = OreZone:new { entities = orePatch.foundEntities,
+            bounds = { minX = orePatch.minX, maxX = orePatch.maxX, minY = orePatch.minY, maxY = orePatch.maxY } }
 
-        
-
-        for i = 1, #foundOrePatch do
-            element = foundOrePatch[i].position
-
-            par.rendering.draw_rectangle {
-                color = { r = 0, g = 0, b = 1, a = 0.1 },
-                filled = true,
-                left_top = { element.x - 0.5, element.y - 0.5 },
-                right_bottom = { element.x + 0.5, element.y + 0.5 },
-                surface = par.game.surfaces[1],
-                only_in_alt_mode = true
-            }
-        end
-
-        for x = orePatch.minX, orePatch.maxX do
-            par.rendering.draw_rectangle {
-                color = { r = 1, g = 0, b = 1, a = 0.1 },
-                filled = false,
-                left_top = { x - 0.5, orePatch.minY - 0.5 },
-                right_bottom = { x + 0.5, orePatch.minY + 0.5 },
-                surface = par.game.surfaces[1],
-                only_in_alt_mode = true
-            }
-            par.rendering.draw_rectangle {
-                color = { r = 1, g = 0, b = 1, a = 0.1 },
-                filled = false,
-                left_top = { x - 0.5, orePatch.maxY - 0.5 },
-                right_bottom = { x + 0.5, orePatch.maxY + 0.5 },
-                surface = par.game.surfaces[1],
-                only_in_alt_mode = true
-            }
-        end
-
-        for y = orePatch.minY, orePatch.maxY do
-            par.rendering.draw_rectangle {
-                color = { r = 1, g = 0, b = 1, a = 0.1 },
-                filled = false,
-                left_top = { orePatch.minX - 0.5, y - 0.5 },
-                right_bottom = { orePatch.minX + 0.5, y + 0.5 },
-                surface = par.game.surfaces[1],
-                only_in_alt_mode = true
-            }
-            par.rendering.draw_rectangle {
-                color = { r = 1, g = 0, b = 1, a = 0.1 },
-                filled = false,
-                left_top = { orePatch.maxX - 0.5, y - 0.5 },
-                right_bottom = { orePatch.maxX + 0.5, y + 0.5 },
-                surface = par.game.surfaces[1],
-                only_in_alt_mode = true
-            }
-        end
+        zone:draw { game = par.game, fill = false, rendering = par.rendering }
 
         if par.previous_positions[self.entityType] == nil then
             par.previous_positions[self.entityType] = {}
         end
 
-        par.previous_positions[self.entityType][1] = {
-            area = orePatch,
-            center = { x = orePatch.minX + math.ceil((orePatch.maxX - orePatch.minX) / 2.0),
-                y = orePatch.minY + math.ceil((orePatch.maxY - orePatch.minY) / 2.0) }
-        }
-
         for entityIndex = 1, #orePatch.foundEntities do
             local orePatchPos = orePatch.foundEntities[entityIndex].position
-            local centerPos = par.previous_positions[self.entityType][1].center
+            local centerPos = zone.center
 
-            local distPos = { x = math.abs(orePatchPos.x - centerPos.x), y = math.abs(orePatchPos.y - centerPos.y)  }
+            local distPos = { x = math.abs(orePatchPos.x - centerPos.x), y = math.abs(orePatchPos.y - centerPos.y) }
 
-            if (distPos.x == 0 and distPos.y == 0) then 
+            if (distPos.x == 0 and distPos.y == 0) then
                 foundOre = orePatch.foundEntities[entityIndex]
 
                 self.target = PathTile:new { x = math.floor(foundOre.position.x), y = math.floor(foundOre.position.y) }
                 self.done = true
             end
         end
-
-        par.rendering.draw_rectangle {
-            color = { r = 0.3, g = 0.6, b = 1, a = 0.1 },
-            filled = false,
-            left_top = { par.previous_positions[self.entityType][1].center.x - 0.5,
-                par.previous_positions[self.entityType][1].center.y - 0.5 },
-            right_bottom = { par.previous_positions[self.entityType][1].center.x + 0.5,
-                par.previous_positions[self.entityType][1].center.y + 0.5 },
-            surface = par.game.surfaces[1],
-            only_in_alt_mode = true
-        }
-
-        -- foundOre = findOre(par.p, par.game, self.entityType)
-
     end
 
     if game.surfaces[1].count_entities_filtered {
@@ -241,9 +167,9 @@ function FindOreObjective:tick(par)
         list = asharp(PathTile:new { x = round(par.p.position.x), y = round(par.p.position.y) }, self.target)
 
         for i = 1, #list do
-            element = list[i]
+            local element = list[i]
 
-            movementOrder = WalkToLocationObjective:new { target = { x = element.x, y = element.y } }
+            local movementOrder = WalkToLocationObjective:new { target = { x = element.x, y = element.y } }
 
 
             movementOrder.renderingTile = par.rendering.draw_rectangle {

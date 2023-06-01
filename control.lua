@@ -11,6 +11,7 @@ require "objectives/objective_insert_materials"
 require "objectives/objective_craft_items.lua"
 require "util/util"
 require "objectives/objective_wait_for_async.lua"
+require "goals/goal_recipe"
 
 local SEARCH_OFFSET = 1
 local GLOBAL_SURFACE_MAP = { { -32, -32 }, { 32, 32 } }
@@ -27,6 +28,10 @@ local done = false
 local previous_positions = {}
 
 local currentObjective = {}
+
+local oreTest = {
+  FindOreObjective:new { entityType = "iron-ore" },
+}
 
 local buildTest = {
   BuildStructureObjective:new { type = "burner-mining-drill", target = { x = 0, y = 0 } }, --target is relative to player position
@@ -96,25 +101,30 @@ local fullObjectives = {
 
 }
 
+local current_goal = RecipeGoal:new { recipe = "automation-science-pack" }
+
 local async_objectives = {}
-
-local entity
-
-local line
-
-local asharp = false
 
 local MODE_FULL = 0
 local MODE_BUILD_TEST = 1
 local MODE_PATHFIND_TEST = 2
+local MODE_GOAL_TEST = 3
 
-local mode = MODE_BUILD_TEST
+local mode = MODE_GOAL_TEST
 
-local function initialize()
+local function initialize(player, game)
   if mode == MODE_FULL then
     currentObjective = fullObjectives
   elseif mode == MODE_BUILD_TEST then
     currentObjective = buildTest
+  else 
+    player.print(current_goal.recipe)
+
+    player.set_goal_description(current_goal.recipe, true)
+
+    player.print(serpent.block(game.recipe_prototypes[current_goal.recipe].ingredients))
+
+    currentObjective = oreTest
   end
 
 
@@ -136,7 +146,7 @@ script.on_event(
       for index, player in pairs(game.connected_players) do
         if init_armor == 1 then
           -- player.begin_crafting { count = 1, recipe = "ai-armor" }
-          initialize()
+          initialize(player, game)
           init_armor = 0
 
           local bp_entity = game.surfaces[1].create_entity { name = 'item-on-ground', position = { x = 0, y = 0 },

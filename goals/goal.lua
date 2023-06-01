@@ -1,11 +1,8 @@
-OreDeposit = {}
+Goal = {}
 
-OreDeposit.bounds = {}
-
-function OreDeposit:new(o)
+function Goal:new(o)
     o = o or {}
     setmetatable(o, self)
     self.__index = self
     return o
 end
-
