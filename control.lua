@@ -1,9 +1,9 @@
 --control.lua
 require "objectives/objective"
-
 require "path_tile"
-
 require "goals/goal_recipe"
+
+local zone_manager = require "zones/zone_manager"
 
 local utility = require "util/util"
 local tests = require "tests/tests"
@@ -19,10 +19,12 @@ local current_goal = RecipeGoal:new { recipe = "automation-science-pack" }
 
 local async_objectives = {}
 
+-- Available modes
 local MODE_FULL = 3
 local MODE_BUILD_TEST = 2
 local MODE_ORE_TEST = 1
 
+-- Mode to automatically run as soon as the player equips the armor
 local mode = MODE_ORE_TEST
 
 local function initialize(player, game)
@@ -31,18 +33,22 @@ local function initialize(player, game)
   player.print("SELECTED TEST " .. mode)
 end
 
+local primary_zone_manager = zone_manager:new{}
+
 script.on_event(
   { defines.events.on_tick },
   function(e)
-
-
     if e.tick % 1 == 0 then
       if done == true then
         do
           return
         end
       end
+
       for index, player in pairs(game.connected_players) do
+        player.set_goal_description(serpent.block(primary_zone_manager.zones, { maxlevel = 3 }), true)
+
+
         if init_armor == 1 then
           -- player.begin_crafting { count = 1, recipe = "ai-armor" }
           initialize(player, game)
@@ -66,7 +72,7 @@ script.on_event(
               else
                 async_objectives[i]:tick { event = e, previous_positions = previous_positions, p = player,
                   currentObjectiveTable =
-                  currentObjective, game = game, rendering = rendering }
+                  currentObjective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
               end
             end
           end
@@ -90,19 +96,19 @@ script.on_event(
                 table.remove(currentObjective, 1)
 
                 if (currentObjective[1]) then
-                  player.set_goal_description(currentObjective[1]:get_name(), true)
+                  -- player.set_goal_description(currentObjective[1]:get_name(), true)
                   currentObjective[1]:tick { event = e, p = player, previous_positions = previous_positions,
                     currentObjectiveTable =
-                    currentObjective, game = game, rendering = rendering }
+                    currentObjective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
                 end
               else
                 currentObjective[1]:tick { event = e, previous_positions = previous_positions, p = player,
                   currentObjectiveTable =
-                  currentObjective, game = game, rendering = rendering }
+                  currentObjective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
               end
             end
           else
-            player.set_goal_description("No current objective", true)
+            -- player.set_goal_description("No current objective", true)
           end
         else
           player.color = { r = 255, g = 140, b = 0, a = 1 }

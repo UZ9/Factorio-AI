@@ -33,7 +33,7 @@ end
 
 --- Draws text label for zone
 function Zone:draw_label(par)
-    par.rendering.draw_text { text = self.label, target = { x = self.bounds.minX + 1, y = self.bounds.minY + 1 },
+    par.rendering.draw_text { text = self.type, target = { x = self.bounds.minX + 1, y = self.bounds.minY + 1 },
         surface = par.game.surfaces[1], only_in_alt_mode = true,
         color = { r = 1, g = 1, b = 1, a = 1 } }
 end

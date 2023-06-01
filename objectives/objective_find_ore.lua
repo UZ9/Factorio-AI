@@ -2,6 +2,7 @@ require "objective"
 require "objective_walk_to_location"
 require "zones/zone"
 require "zones/zone_ore"
+require "patterns/pattern_burner_mining"
 
 FindOreObjective = PathfindToLocationObjective:new()
 
@@ -134,10 +135,15 @@ function FindOreObjective:tick(par)
             return
         end
 
-        local zone = OreZone:new { entities = orePatch.foundEntities,
+        local zone = OreZone:new { type = self.entityType, entities = orePatch.foundEntities,
             bounds = { minX = orePatch.minX, maxX = orePatch.maxX, minY = orePatch.minY, maxY = orePatch.maxY } }
 
         zone:draw { game = par.game, fill = false, rendering = par.rendering }
+
+        par.zone_manager:register_zone(zone)
+
+        local pattern = BurnerMiningPattern:new {}
+        pattern:apply_pattern(par.game, par.p, zone)
 
         if par.previous_positions[self.entityType] == nil then
             par.previous_positions[self.entityType] = {}
@@ -166,27 +172,30 @@ function FindOreObjective:tick(par)
     then
         list = asharp(PathTile:new { x = round(par.p.position.x), y = round(par.p.position.y) }, self.target)
 
-        for i = 1, #list do
-            local element = list[i]
+        if list then
 
-            local movementOrder = WalkToLocationObjective:new { target = { x = element.x, y = element.y } }
+            for i = 1, #list do
+                local element = list[i]
+
+                local movementOrder = WalkToLocationObjective:new { target = { x = element.x, y = element.y } }
 
 
-            movementOrder.renderingTile = par.rendering.draw_rectangle {
-                color = { r = 0, g = 1, b = 0, a = 1 },
-                filled = true,
-                left_top = { element.x, element.y },
-                right_bottom = { element.x + 1, element.y + 1 },
-                surface = game.surfaces[1],
-                only_in_alt_mode = true
-            }
+                movementOrder.renderingTile = par.rendering.draw_rectangle {
+                    color = { r = 0, g = 1, b = 0, a = 1 },
+                    filled = true,
+                    left_top = { element.x, element.y },
+                    right_bottom = { element.x + 1, element.y + 1 },
+                    surface = game.surfaces[1],
+                    only_in_alt_mode = true
+                }
 
-            if i == 1 then
-                movementOrder.tag = self.tag
-                self.tag = nil
+                if i == 1 then
+                    movementOrder.tag = self.tag
+                    self.tag = nil
+                end
+
+                table.insert(par.currentObjectiveTable, 2, movementOrder)
             end
-
-            table.insert(par.currentObjectiveTable, 2, movementOrder)
         end
 
 
