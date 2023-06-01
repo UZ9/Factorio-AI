@@ -48,13 +48,9 @@ script.on_event(
       for index, player in pairs(game.connected_players) do
         player.set_goal_description(serpent.block(primary_zone_manager.zones, { maxlevel = 3 }), true)
 
-
         if init_armor == 1 then
-          -- player.begin_crafting { count = 1, recipe = "ai-armor" }
           initialize(player, game)
           init_armor = 0
-
-
         end
         if player.character and
             player.get_inventory(defines.inventory.character_armor).get_item_count("ai-armor") > 0
