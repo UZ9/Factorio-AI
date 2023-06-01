@@ -143,7 +143,8 @@ function FindOreObjective:tick(par)
         par.zone_manager:register_zone(zone)
 
         local pattern = BurnerMiningPattern:new {}
-        pattern:apply_pattern(par.game, par.p, zone)
+        pattern:apply_pattern(par.rendering, par.game, par.p, zone, 1)
+        pattern:apply_pattern(par.rendering, par.game, par.p, zone, 3)
 
         if par.previous_positions[self.entityType] == nil then
             par.previous_positions[self.entityType] = {}

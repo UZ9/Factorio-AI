@@ -1,8 +1,10 @@
 require "zone"
+require "patterns/pattern_burner_mining"
 
 OreZone = Zone:new()
 
 OreZone.someValue = true
+OreZone.pattern = BurnerMiningPattern:new{}
 
 function OreZone:draw(par)
     self:draw_outline(par)
@@ -24,4 +26,8 @@ function OreZone:draw(par)
             }
         end
     end
+end
+
+function OreZone:apply_pattern(par)
+
 end
