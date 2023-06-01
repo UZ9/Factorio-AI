@@ -1,5 +1,5 @@
 require "objective"
-require "util/util"
+local util = require "util/util"
 
 BuildStructureObjective = Objective:new()
 
@@ -25,8 +25,8 @@ function BuildStructureObjective:tick(par)
     if self.position == nil then
         if type(self.target) == "table" then
             self.position = {
-                x = math.floor(par.p.position.x) + self.target.x,
-                y = math.floor(par.p.position.y) + self.target.y
+                x = self.target.x,
+                y = self.target.y
             }
         else
             self.position = {
@@ -39,7 +39,7 @@ function BuildStructureObjective:tick(par)
     targetPos = self.position
 
     if
-        (distanceSquared(par.p.position, targetPos) > 36) or
+        (util:distance_squared(par.p.position, targetPos) > 36) or
             isPlayerInBox(
                 par.p.position,
                 game.entity_prototypes["character"].collision_box,
@@ -62,7 +62,7 @@ function BuildStructureObjective:tick(par)
             par.p.print("in box")
         end
 
-        if distanceSquared(par.p.position, targetPos) > 36 then
+        if util:distance_squared(par.p.position, targetPos) > 36 then
             par.p.print("distance ")
         end
 

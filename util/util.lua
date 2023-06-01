@@ -5,7 +5,7 @@ function utility:distance_squared(positionA, positionB)
 end
 
 function utility:distance(positionA, positionB)
-    return math.sqrt(distanceSquared(positionA, positionB))
+    return math.sqrt(self:distanceSquared(positionA, positionB))
 end
 
 function utility:remove_nil(t)

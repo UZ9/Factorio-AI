@@ -146,6 +146,8 @@ function FindOreObjective:tick(par)
         pattern:apply_pattern(par.rendering, par.game, par.p, zone, 1)
         pattern:apply_pattern(par.rendering, par.game, par.p, zone, 3)
 
+        pattern:build_next { current_objective = par.currentObjectiveTable, rendering = par.rendering, game = par.game, player = par.p  }
+
         if par.previous_positions[self.entityType] == nil then
             par.previous_positions[self.entityType] = {}
         end
