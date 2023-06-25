@@ -4,7 +4,7 @@ local util = require "util/util"
 BuildStructureObjective = Objective:new()
 
 BuildStructureObjective.target = nil
-BuildStructureObjective.position = nil --temporary workaround until I find a better solution that doesn't use target AND position
+BuildStructureObjective.position = nil
 BuildStructureObjective.type = nil
 BuildStructureObjective.entity = nil
 BuildStructureObjective.direction = defines.direction.north
@@ -18,6 +18,10 @@ end
 
 function BuildStructureObjective:finished(par)
     return self.done == true
+end
+
+function BuildStructureObjective:get_name()
+    return "Building " .. self.type .. " at " .. serpent.block(self.target)
 end
 
 function BuildStructureObjective:tick(par)
@@ -36,7 +40,7 @@ function BuildStructureObjective:tick(par)
         end
     end
 
-    targetPos = self.position
+    local targetPos = self.position
 
     if
         (util:distance_squared(par.p.position, targetPos) > 36) or
@@ -66,11 +70,11 @@ function BuildStructureObjective:tick(par)
             par.p.print("distance ")
         end
 
-        collider = game.entity_prototypes[self.type].collision_box
+        local collider = game.entity_prototypes[self.type].collision_box
 
         par.p.print("{" .. collider.left_top.x .. ", " .. collider.left_top.y .. "}")
 
-        movementOrder =
+        local movementOrder =
             WalkToLocationObjective:new {
             target = {
                 x = self.position.x + collider.left_top.x,
@@ -88,7 +92,7 @@ function BuildStructureObjective:tick(par)
                 force = par.p.force
             })
          then
-            inventory = par.p.get_inventory(defines.inventory.character_main)
+            local inventory = par.p.get_inventory(defines.inventory.character_main)
 
             if inventory.get_item_count(self.type) ~= 0 then
                 inventory.remove({name = self.type, count = 1})

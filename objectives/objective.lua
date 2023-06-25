@@ -1,6 +1,7 @@
 Objective = {}
 
 Objective.done = false
+Objective.finish_function = function(par) end
 
 function Objective:new(o)
     o = o or {}
@@ -43,4 +44,6 @@ function Objective:cleanup(par)
         par.rendering.draw_text { text = self.tag, target = newPos, surface = game.surfaces[1], only_in_alt_mode = true,
             color = { r = 1, g = 1, b = 1, a = 1 } }
     end
+
+    self.finish_function(par)
 end

@@ -12,7 +12,7 @@ function MineResourcesObjective:get_name()
 end
 
 function MineResourcesObjective:tick(par)
-    tile = par.game.surfaces[1].get_tile(par.p.position)
+    local tile = par.game.surfaces[1].get_tile(par.p.position)
     par.p.update_selected_entity({x=tile.position.x+0.5, y=tile.position.y+0.5})
     par.p.mining_state={mining=true, position=par.p.position}
 end

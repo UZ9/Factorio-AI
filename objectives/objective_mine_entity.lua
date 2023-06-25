@@ -16,7 +16,7 @@ function MineEntityObjective:tick(par)
     if self.target ~= nil then 
         par.p.mining_state={mining=true, position=target.position}
     else 
-        self.done = true 
+        self.done = true
     end
 end
 

@@ -92,18 +92,18 @@ function FindOreObjective:findOrePatch(par)
 end
 
 function findOre(player, game, entityType)
-    searchSize = 5
+    local searchSize = 5
 
-    foundEntity = nil
+    local foundEntity = nil
 
-    count = 0
+    local count = 0
 
     while foundEntity == nil do
         if searchSize > 1000 then
             return nil
         end
 
-        foundEntities = game.surfaces[1].find_entities_filtered {
+        local foundEntities = game.surfaces[1].find_entities_filtered {
             area = {
                 { x = player.position.x - searchSize, y = player.position.y - searchSize },
                 { x = player.position.x + searchSize, y = player.position.y + searchSize }
@@ -127,7 +127,7 @@ function FindOreObjective:tick(par)
     end
 
     if self.target == null then
-        orePatch = self:findOrePatch(par)
+        local orePatch = self:findOrePatch(par)
 
         if orePatch == nil then
             par.p.print("No ore patch found with type " .. self.entityType)
@@ -141,6 +141,8 @@ function FindOreObjective:tick(par)
         zone:draw { game = par.game, fill = false, rendering = par.rendering }
 
         par.zone_manager:register_zone(zone)
+
+        -- Objective: build to zone
 
         local pattern = BurnerMiningPattern:new {}
         pattern:apply_pattern(par.rendering, par.game, par.p, zone, 1)
@@ -159,7 +161,7 @@ function FindOreObjective:tick(par)
             local distPos = { x = math.abs(orePatchPos.x - centerPos.x), y = math.abs(orePatchPos.y - centerPos.y) }
 
             if (distPos.x == 0 and distPos.y == 0) then
-                foundOre = orePatch.foundEntities[entityIndex]
+                local foundOre = orePatch.foundEntities[entityIndex]
 
                 self.target = PathTile:new { x = math.floor(foundOre.position.x), y = math.floor(foundOre.position.y) }
                 self.done = true
@@ -173,7 +175,7 @@ function FindOreObjective:tick(par)
         collision_mask = "player-layer"
     } == 0
     then
-        list = asharp(PathTile:new { x = round(par.p.position.x), y = round(par.p.position.y) }, self.target)
+        local list = astar(PathTile:new { x = round(par.p.position.x), y = round(par.p.position.y) }, self.target)
 
         if list then
 

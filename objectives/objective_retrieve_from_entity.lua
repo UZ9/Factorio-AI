@@ -32,29 +32,5 @@ function RetrieveFromEntityObjective:tick(par)
       par.p.get_inventory(defines.inventory.character_main).insert(item_stack)
       inventory.remove(item_stack)
     end
-
-
-  -- local target_ingredients = par.game.recipe_prototypes[self.to_retrieve.count].ingredients
-
-  -- for ingredient
-
-
-  --   player_inventory = par.p.get_inventory(defines.inventory.character_main)
-
-  --   if player_inventory.get_item_count(self.to_insert.name) >= self.to_insert.count then
-  --     if (targetEntity.can_insert(self.to_insert)) then
-  --       targetEntity.insert(self.to_insert)
-  --       player_inventory.remove(self.to_insert)
-  --     else
-  --       par.p.print("Failed to insert items")
-  --     end
-  --   else
-  --     par.p.print("Not enough items in player inventory")
-  --   end
-
-  -- tile = par.game.surfaces[1].get_tile(par.p.position)
-  -- par.p.update_selected_entity({x=tile.position.x+0.5, y=tile.position.y+0.5})
-  -- par.p.mining_state={mining=true, position=par.p.position}
-
   self.done = true
 end

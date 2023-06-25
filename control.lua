@@ -3,6 +3,8 @@ require "objectives/objective"
 require "path_tile"
 require "goals/goal_recipe"
 
+local aw = require "util/async_await"
+
 local zone_manager = require "zones/zone_manager"
 
 local utility = require "util/util"
@@ -13,7 +15,7 @@ local done = false
 
 local previous_positions = {}
 
-local currentObjective = {}
+local current_objective = {}
 
 local current_goal = RecipeGoal:new { recipe = "automation-science-pack" }
 
@@ -28,12 +30,20 @@ local MODE_ORE_TEST = 1
 local mode = MODE_ORE_TEST
 
 local function initialize(player, game)
-  currentObjective = tests[mode]
+  -- current_objective = tests[mode]
 
+  --[[
+    find_ore_objective 
+    when it finishes:
+    attempt build 
+  ]]
+    end
+  end
+end
   player.print("SELECTED TEST " .. mode)
 end
 
-local primary_zone_manager = zone_manager:new{}
+local primary_zone_manager = zone_manager:new {}
 
 script.on_event(
   { defines.events.on_tick },
@@ -45,8 +55,8 @@ script.on_event(
         end
       end
 
-      for index, player in pairs(game.connected_players) do
-        player.set_goal_description(serpent.block(primary_zone_manager.zones, { maxlevel = 3 }), true)
+      for _, player in pairs(game.connected_players) do
+        -- player.set_goal_description(serpent.block(primary_zone_manager.zones, { maxlevel = 3 }), true)
 
         if init_armor == 1 then
           initialize(player, game)
@@ -58,7 +68,7 @@ script.on_event(
           if #async_objectives > 0 then
             for i = 1, #async_objectives do
 
-              if async_objectives[i]:finished { event = e, p = player, currentObjectiveTable = currentObjective,
+              if async_objectives[i]:finished { event = e, p = player, currentObjectiveTable = current_objective,
                 game =
                 game, rendering = rendering } then
                 async_objectives[i]:cleanup { rendering = rendering, previous_positions = previous_positions,
@@ -68,43 +78,43 @@ script.on_event(
               else
                 async_objectives[i]:tick { event = e, previous_positions = previous_positions, p = player,
                   currentObjectiveTable =
-                  currentObjective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
+                  current_objective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
               end
             end
           end
 
           async_objectives = utility:remove_nil(async_objectives)
 
-          if currentObjective[1] then
-            if currentObjective[1].asyncTask == true then
+          if current_objective[1] then
+            if current_objective[1].asyncTask == true then
               player.print("Found async ")
-              table.insert(async_objectives, currentObjective[1])
-              table.remove(currentObjective, 1)
+              table.insert(async_objectives, current_objective[1])
+              table.remove(current_objective, 1)
             end
 
-            if currentObjective[1] then
+            if current_objective[1] then
 
-              if currentObjective[1]:finished { event = e, p = player, current_async_objectives = async_objectives,
-                currentObjectiveTable = currentObjective,
+              if current_objective[1]:finished { event = e, p = player, current_async_objectives = async_objectives,
+                currentObjectiveTable = current_objective,
                 game =
                 game, rendering = rendering } then
-                currentObjective[1]:cleanup { rendering = rendering, previous_positions = previous_positions, p = player }
-                table.remove(currentObjective, 1)
+                current_objective[1]:cleanup { rendering = rendering, previous_positions = previous_positions, p = player }
+                table.remove(current_objective, 1)
 
-                if (currentObjective[1]) then
-                  -- player.set_goal_description(currentObjective[1]:get_name(), true)
-                  currentObjective[1]:tick { event = e, p = player, previous_positions = previous_positions,
+                if (current_objective[1]) then
+                  player.set_goal_description(current_objective[1]:get_name(), true)
+                  current_objective[1]:tick { event = e, p = player, previous_positions = previous_positions,
                     currentObjectiveTable =
-                    currentObjective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
+                    current_objective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
                 end
               else
-                currentObjective[1]:tick { event = e, previous_positions = previous_positions, p = player,
+                current_objective[1]:tick { event = e, previous_positions = previous_positions, p = player,
                   currentObjectiveTable =
-                  currentObjective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
+                  current_objective, game = game, rendering = rendering, zone_manager = primary_zone_manager }
               end
             end
           else
-            -- player.set_goal_description("No current objective", true)
+            player.set_goal_description("No current objective", true)
           end
         else
           player.color = { r = 255, g = 140, b = 0, a = 1 }

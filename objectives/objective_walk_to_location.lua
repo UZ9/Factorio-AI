@@ -7,14 +7,6 @@ WalkToLocationObjective.renderingTile = nil
 
 local TILE_RADIUS = 0.3
 
-local function tablelength(table)
-  local count = 0
-  for index in pairs(table) do
-    count = count + 1
-  end
-  return count
-end
-
 local function getDegrees(player, target, xDist, yDist)
   if xDist > 0 and yDist >= 0 then
     return math.deg(math.atan(xDist / yDist)) + 90 --quadrant 4
@@ -31,7 +23,6 @@ end
 
 local function getDirection(player, target, xDist, yDist)
   angle = getDegrees(player, target, xDist, yDist)
-  --player.print(angle)
 
   if angle > 337.5 then
     return defines.direction.north
@@ -60,10 +51,6 @@ local function getDirection(player, target, xDist, yDist)
   return defines.direction.north
 end
 
-local function round(value)
-  return math.floor(value + 0.5)
-end
-
 local xDist = 0
 local yDist = 0
 
@@ -72,7 +59,7 @@ function WalkToLocationObjective:get_name()
 end
 
 function WalkToLocationObjective:finished(par)
-  player = par.p
+  local player = par.p
 
   xDist = self.target.x - player.position.x + 0.5
   yDist = self.target.y - player.position.y + 0.5
@@ -93,15 +80,7 @@ function WalkToLocationObjective:tick(par)
     return
   end
 
-  player = par.p
-
-  distance =
-    math.sqrt(
-    math.pow(math.abs(player.position.x - (self.target.x + 0.5)), 2) +
-      math.pow(math.abs(player.position.y - (self.target.y + 0.5)), 2)
-  )
-
-
+  local player = par.p
 
   if not self.done then
     player.character_running_speed_modifier = 0.1
