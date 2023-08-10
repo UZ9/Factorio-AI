@@ -7,10 +7,13 @@ require "objectives/objective_mine_resources"
 require "objectives/objective_insert_materials"
 require "objectives/objective_craft_items.lua"
 require "objectives/objective_wait_for_async.lua"
-
+require "objectives/objective_apply_ore_pattern.lua"
+require "objectives/objective_build_on_ore_pattern.lua"
 
 local oreTest = {
     FindOreObjective:new { entityType = "iron-ore" },
+    ApplyOrePatternObjective:new { zone_type = "iron-ore" },
+    BuildOnOrePatternObjective:new { zone_type = "iron-ore" },
 }
 
 local buildTest = {

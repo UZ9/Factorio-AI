@@ -17,7 +17,7 @@ local previous_positions = {}
 
 local current_objective = {}
 
-local current_goal = RecipeGoal:new { recipe = "automation-science-pack" }
+local current_goal = RecipeGoal:new { recipe = "burner-mining-drill" }
 
 local async_objectives = {}
 
@@ -30,16 +30,18 @@ local MODE_ORE_TEST = 1
 local mode = MODE_ORE_TEST
 
 local function initialize(player, game)
-  -- current_objective = tests[mode]
+  current_objective = tests[mode]
+
+  
 
   --[[
     find_ore_objective 
     when it finishes:
     attempt build 
   ]]
-    end
-  end
-end
+    --end
+   --end
+-- end
   player.print("SELECTED TEST " .. mode)
 end
 

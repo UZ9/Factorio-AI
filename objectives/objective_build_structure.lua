@@ -51,21 +51,6 @@ function BuildStructureObjective:tick(par)
                 game.entity_prototypes[self.type].collision_box
             )
      then --36 is default distance squared
-        --self.done = true
-        --move to somewhere to be in range
-        par.p.print("Outside of build range")
-
-        if
-            isPlayerInBox(
-                par.p.position,
-                par.game.entity_prototypes["character"].collision_box,
-                targetPos,
-                par.game.entity_prototypes[self.type].collision_box
-            )
-         then
-            par.p.print("in box")
-        end
-
         if util:distance_squared(par.p.position, targetPos) > 36 then
             par.p.print("distance ")
         end
@@ -98,11 +83,11 @@ function BuildStructureObjective:tick(par)
                 inventory.remove({name = self.type, count = 1})
 
                 self.entity =
-                    player.surface.create_entity {
+                    par.p.surface.create_entity {
                     name = self.type,
                     position = targetPos,
                     direction = self.direction,
-                    force = player.force
+                    force = par.p.force
                 }
 
                 self.done = true

@@ -72,7 +72,11 @@ function Pattern:apply_pattern(rendering, game, player, zone, max_count)
             end
 
             if can_place then
+                player.print("adding to ubild qiue")
+
                 self.buildQueue[self.currentIndex] = { x = x, y = y }
+
+                player.print(serpent.block(self.buildQueue))
 
                 bp_entity.stack.build_blueprint {
                     surface = game.surfaces[1],
@@ -87,14 +91,12 @@ function Pattern:apply_pattern(rendering, game, player, zone, max_count)
                     color = { r = 1, g = 0.6, b = 0, a = 1 },
                     filled = false,
                     left_top = { x - 0.5,
-                    y - 1.5 },
+                        y - 1.5 },
                     right_bottom = { x + self.stepX - 0.5,
-                    y + self.stepY - 1.5 },
+                        y + self.stepY - 1.5 },
                     surface = game.surfaces[1],
                     only_in_alt_mode = true
                 }
-            else
-                player.print("Couldn't polka for " .. serpent.block({ x = x, y = y }))
             end
         end
 
@@ -103,6 +105,21 @@ function Pattern:apply_pattern(rendering, game, player, zone, max_count)
     bp_entity.destroy()
 
 
+
+end
+
+function Pattern:get_pattern_entities(par)
+    -- Import blueprint of pattern
+    local bp_entity = game.surfaces[1].create_entity { name = 'item-on-ground',
+        position = { x = 0, y = 0 },
+        stack = 'blueprint' }
+
+    bp_entity.stack.import_stack(self.blueprintString)
+    local bp_entities = bp_entity.stack.get_blueprint_entities()
+
+    bp_entity.destroy()
+
+    return bp_entities
 
 end
 
@@ -118,9 +135,13 @@ function Pattern:build_next(par)
 
     -- Add to build index
     self.currentBuildIndex = self.currentBuildIndex + 1
-    
-    -- Find pos based on build index 
+
+    par.player.print(serpent.block(self.buildQueue))
+
+    -- Find pos based on build index
     local position = self.buildQueue[self.currentBuildIndex]
+
+    -- par.player.print(serpent.block({self}))
 
     -- Draw that region has changed
 
@@ -128,17 +149,25 @@ function Pattern:build_next(par)
         color = { r = 0, g = 0.6, b = 0, a = 1 },
         filled = false,
         left_top = { position.x - 0.5,
-        position.y - 1.5 },
+            position.y - 1.5 },
         right_bottom = { position.x + self.stepX - 0.5,
-        position.y + self.stepY - 1.5 },
+            position.y + self.stepY - 1.5 },
         surface = par.game.surfaces[1],
         only_in_alt_mode = true
     }
 
     -- Loop over entities
     for _, entity in pairs(bp_entities) do
-        table.insert(par.current_objective, BuildStructureObjective:new { type = entity.name, direction = entity.direction,
-        target = {x = position.x + entity.position.x, y = position.y + entity.position.y }}) 
+
+        if par.player.get_inventory(defines.inventory.character_main).get_item_count(entity.name) > 0 then
+
+            table.insert(par.current_objective,
+                BuildStructureObjective:new { type = entity.name, direction = entity.direction,
+                    target = { x = position.x + entity.position.x, y = position.y + entity.position.y } })
+        else
+            par.player.print("didn't have a " .. entity.name)
+        end
+
     end
 
     par.player.print(serpent.block(bp_entity.stack.cost_to_build))

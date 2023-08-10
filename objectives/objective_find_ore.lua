@@ -136,19 +136,12 @@ function FindOreObjective:tick(par)
         end
 
         local zone = OreZone:new { type = self.entityType, entities = orePatch.foundEntities,
-            bounds = { minX = orePatch.minX, maxX = orePatch.maxX, minY = orePatch.minY, maxY = orePatch.maxY } }
+            bounds = { minX = orePatch.minX, maxX = orePatch.maxX, minY = orePatch.minY, maxY = orePatch.maxY, pattern = BurnerMiningPattern:new{} } }
 
         zone:draw { game = par.game, fill = false, rendering = par.rendering }
 
         par.zone_manager:register_zone(zone)
 
-        -- Objective: build to zone
-
-        local pattern = BurnerMiningPattern:new {}
-        pattern:apply_pattern(par.rendering, par.game, par.p, zone, 1)
-        pattern:apply_pattern(par.rendering, par.game, par.p, zone, 3)
-
-        pattern:build_next { current_objective = par.currentObjectiveTable, rendering = par.rendering, game = par.game, player = par.p  }
 
         if par.previous_positions[self.entityType] == nil then
             par.previous_positions[self.entityType] = {}
